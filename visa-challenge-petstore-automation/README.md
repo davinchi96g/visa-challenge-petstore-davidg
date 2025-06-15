@@ -1,25 +1,9 @@
-# Getting started with REST API testing with Serenity and Cucumber 6
+# PetStore with REST API testing with Serenity and Cucumber 6
 
-This tutorial show you how to get started with REST-API testing using Serenity and Cucumber 6. 
-
-## Get the code
-
-Git:
-
-    git clone https://github.com/serenity-bdd/serenity-rest-starter.git
-    cd serenity-rest-starter
-
-
-Or simply [download a zip](https://github.com/serenity-bdd/serenity-repository-starter/archive/master.zip) file.
-
-## The starter project
-The best place to start with Serenity and Cucumber is to clone or download the starter project on Github ([https://github.com/serenity-bdd/serenity-rest-starter](https://github.com/serenity-bdd/rest-cucumber4-starter)). 
-This project gives you a basic project setup, along with some sample tests and supporting classes. 
-The starter project comes bundled with a sample SpringBoot web service, and some RestAssured-based tests. 
-The project also illustrates how you might use Freemarker to prepare test data for your scenarios.
+This framework was builded following the template serenity-rest-starter created by Wakaleo, after that the project was redefined in architecture trying to reach a ScreenPlay pattern
 
 ### The project directory structure
-The project has build scripts for both Maven and Gradle, and follows the standard directory structure used in most Serenity projects:
+The project has build scripts for both Maven and Gradle, and follows the next architecture
 ```Gherkin
 src
   + main
@@ -202,9 +186,3 @@ And also details of the REST requests and responses that were executed during th
 
 ![](src/docs/rest-report.png)
 
-
-## Want to learn more?
-For more information about Serenity BDD, you can read the [**Serenity BDD Book**](https://serenity-bdd.github.io/theserenitybook/latest/index.html), the official online Serenity documentation source. Other sources include:
-* **[Byte-sized Serenity BDD](https://www.youtube.com/channel/UCav6-dPEUiLbnu-rgpy7_bw/featured)** - tips and tricks about Serenity BDD
-* [**Serenity BDD Blog**](https://johnfergusonsmart.com/category/serenity-bdd/) - regular articles about Serenity BDD
-* [**The Serenity BDD Dojo**](https://serenitydojo.teachable.com) - Online training on Serenity BDD and on test automation and BDD in general.

@@ -1,18 +1,18 @@
 package utils;
 
 public enum WebServiceEndPoints {
+    PET("/pet"),
+    PETBYTAG("/pet/findByTags"),
+    PETBYSTATUS("/pet/findByStatus"),
+    PETIMAGE("/pet/%s/uploadImage") ;
 
-    PET("http://localhost:8085/api/v3/pet"),
-    PETBYTAG("/pet/findByTags");
+    private final String path;
 
-
-    private final String url;
-
-    WebServiceEndPoints(String url) {
-        this.url = url;
+    WebServiceEndPoints(String path) {
+        this.path = path;
     }
 
-    public String getUrl() {
-        return "http://localhost:8085/api/v3" + url;
+    public String getPath() {
+        return path;
     }
 }

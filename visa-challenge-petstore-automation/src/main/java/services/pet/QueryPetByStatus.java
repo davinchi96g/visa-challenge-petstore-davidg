@@ -7,16 +7,15 @@ import utils.Constants;
 import utils.ResponseValidator;
 import utils.WebServiceEndPoints;
 
-
-public class QueryPetByTag {
-    @Step("Query pet by Tag")
-    public void withDetails(String tagName) {
+public class QueryPetByStatus {
+    @Step("Query pet by Status")
+    public void withDetails(String status) {
         Response response = SerenityRest.given()
                 .baseUri(Constants.BASE_URL)
                 .contentType(ContentType.JSON)
-                .queryParam("tags", tagName)
+                .queryParam("status", status)
                 .when()
-                .get(WebServiceEndPoints.PETBYTAG.getPath());
+                .get(WebServiceEndPoints.PETBYSTATUS.getPath());
         ResponseValidator.validateStatus(response);
     }
 }

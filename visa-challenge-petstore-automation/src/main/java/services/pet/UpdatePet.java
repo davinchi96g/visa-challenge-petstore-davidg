@@ -1,4 +1,5 @@
 package services.pet;
+
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import net.serenitybdd.rest.SerenityRest;
@@ -7,16 +8,15 @@ import utils.Constants;
 import utils.ResponseValidator;
 import utils.WebServiceEndPoints;
 
-
-public class QueryPetByTag {
-    @Step("Query pet by Tag")
-    public void withDetails(String tagName) {
+public class UpdatePet {
+    @Step("Update a pet")
+    public void withDetails(String pet) {
         Response response = SerenityRest.given()
                 .baseUri(Constants.BASE_URL)
                 .contentType(ContentType.JSON)
-                .queryParam("tags", tagName)
+                .body(pet)
                 .when()
-                .get(WebServiceEndPoints.PETBYTAG.getPath());
+                .put(WebServiceEndPoints.PET.getPath());
         ResponseValidator.validateStatus(response);
     }
 }
