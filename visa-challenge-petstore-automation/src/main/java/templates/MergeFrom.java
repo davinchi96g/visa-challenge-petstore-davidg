@@ -1,6 +1,5 @@
-package starter.templates;
+package templates;
 
-import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 

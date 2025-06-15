@@ -1,4 +1,4 @@
-package starter.templates;
+package templates;
 
 import java.io.IOException;
 import java.util.Map;

@@ -1,8 +1,11 @@
-package starter.stepdefinitions;
+package stepdefinitions;
 
+import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.cucumber.java.en.Then;
+import net.serenitybdd.screenplay.actors.OnStage;
+import net.serenitybdd.screenplay.actors.OnlineCast;
 import net.thucydides.core.annotations.Steps;
 import starter.status.ApplicationStatus;
 
@@ -12,6 +15,11 @@ import static org.hamcrest.Matchers.equalTo;
 import static starter.status.AppStatus.RUNNING;
 
 public class ApplicationStatusStepDefinitions {
+
+    @Before
+    public void setUp() {
+        OnStage.setTheStage(new OnlineCast());
+    }
 
     @Steps
     ApplicationStatus theApplication;

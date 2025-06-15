@@ -1,11 +1,11 @@
-package starter.stepdefinitions;
+package stepdefinitions;
 
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.cucumber.java.en.Then;
 import net.thucydides.core.annotations.Steps;
-import starter.templates.FieldValues;
-import starter.templates.MergeFrom;
+import templates.FieldValues;
+import templates.MergeFrom;
 import starter.trades.TradeResponse;
 import starter.trades.RecordNewTrade;
 
