@@ -29,7 +29,7 @@ public class ResponseValidator {
         try {
             assertThat(actual).containsAllEntriesOf(expected);
         } catch (AssertionError e) {
-            throw new ServiceException("❌ Fail validation, the expected Value is different from the actual value.\n"
+            throw new ServiceException("Fail validation, the expected Value is different from the actual value.\n"
                     + "Expected: " + expected + "\n"
                     + "Actual: " + actual);
         }
