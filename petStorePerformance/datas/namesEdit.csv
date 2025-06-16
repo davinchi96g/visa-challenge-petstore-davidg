@@ -1,0 +1,10 @@
+id,name,status,tag
+1,Carlos,available,tag1
+2,Ana,pending,tag2
+3,Juan,sold,tag3
+4,Laura,available,tag4
+5,David,pending,tag1
+6,Andrea,sold,tag2
+7,Luis,available,tag3
+8,Valentina,pending,tag4
+9,Pedro,available,tag1
