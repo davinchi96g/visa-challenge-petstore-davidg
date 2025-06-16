@@ -59,13 +59,13 @@ The project can run the automated tests using either **Gradle** or **Maven**
 #### Using Maven:
 
 ```bash
-mvn clean test
+mvn clean verify
 ```
 
-To generate the Serenity report after the tests:
+#### Using Gradle:
 
 ```bash
-mvn serenity:aggregate
+./gradlew clean test
 ```
 #### Using a Runner Class
 
