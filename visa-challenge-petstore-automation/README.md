@@ -7,180 +7,251 @@ The project has build scripts for both Maven and Gradle, and follows the next ar
 ```Gherkin
 src
   + main
+    +java                                 User layer, tasks and interactions
+      + exceptions
+      + services
+      + templates                         Tasks for request creation                       
+      + utils
   + test
     + java                                Test runners and supporting code
-    + resources
-      + features                          Feature files 
-          + status
-          + trades
-             record_a_new_trade.feature 
-      + templates                         Freemarker templates and properties files                
+      +runners
+      +stepDefinitions
+      + resources
+        + features                          Feature files
+          + pet
+              pet.feature
+          + store
+          + user
+        + images
+        + schemas
+        + templates                         Freemarker templates and properties files
+  
 
 ```
+## Post scenario
 
-## A simple GET scenario
-The project comes with two simple scenarios, one that illustrates a GET, and a second that illustrates a POST.
-
-The first scenario exercises the `/api/status` endpoint
-Both variations of the sample project uses the sample Cucumber scenario. 
-In this scenario, Sergey (who likes to search for stuff) is performing a search on the DuckDuckGo search engine:
-
-```Gherkin
-  Scenario: Application status end-point
-    Given the application is running
-    When I check the application status
-    Then the API should return "Serenity REST Starter project up and running"
-```
-
-The glue code for this scenario illustrates the layered approach we find works well for both web and non-web acceptance tests.
-The glue code is responsible for orchestrating calls to a layer of more business-focused classes, which perform the actual REST calls.
-
-```java
-    @Steps
-    ApplicationStatus theApplication;
-
-    @Given("the application is running")
-    public void the_application_is_running() {
-        assertThat(theApplication.currentStatus()).isEqualTo(RUNNING);
-    }
-
-    @When("I check the application status")
-    public void i_check_the_application_status() {
-        theApplication.readStatusMessage();
-    }
-```
-
-The actual REST calls are performed using RestAssured in the action classes, like `ApplicationStatus` here. 
-These use either RestAssured (if we don't want the queries to appear in the reports) or SerenityRest (if we do):
-
-```java
-public class ApplicationStatus {
-
-    public AppStatus currentStatus() {
-        int statusCode = RestAssured.get(STATUS.getUrl()).statusCode();
-        return (statusCode == 200) ? AppStatus.RUNNING : AppStatus.DOWN;
-    }
-
-    @Step("Get current status message")
-    public void readStatusMessage() {
-        SerenityRest.get(STATUS.getUrl());
-    }
-}
-```
-
-In steps that perform assertions, we can also use the `SerenityRest.restAssuredThat()` helper method, 
-which lets us make a RestAssured assertion on the last response the server sent us:
-
-```java
-
-    @Then("the API should return {string}")
-    public void the_API_should_return(String expectedMessage) {
-        restAssuredThat(lastResponse -> lastResponse.body(equalTo(expectedMessage)));
-    }
-```
-
-
-## A more complex scenario
-
-The other sample scenario performs a POST query:
+The first kind of scenario for creating a Pet, in addition all the scenarios includes a tag `@ApiTest` this with the objective of running the scenarios by tag filtering
 
 ```gherkin
-Feature: Record a new trade
-
-  Scenario: Each trade has a unique ID
-    Given the following trade:
-    | security | buySell | quantity | priceInCents |
-    | APPL     | BUY     | 10       | 10000        |
-    When I record the trade
-    Then the recorded trade should include the following details:
-      | security | buySell | quantity | priceInCents | totalCostInCents |
-      | APPL     | BUY     | 10       | 10000        | 100000           |
-
+Feature: Feature: Pet End to End flow
+  
+  @ApiTest
+  Scenario: Add a new pet to the Store
+    Given the following data for the pet:
+      | id | name  | categoryId | categoryName | photoUrl   | tagId | tagName | status    |
+      | 10 | David | 10         | Dogs         | TestString | 10    | string  | available |
+    When I record the pet
+    Then the response message should have a valid body
 ```
 
-The _Given_ step uses a Freemarker template to merge the data in the Cucumber table with values defined in a properties file -
-to see how this works in detail, have a look at the `MergeFrom` class.
+The _Given_ step uses a Freemarker template to merge the data in the Cucumber table with values defined 
+in a properties file `standard-pet.properties`- to see how this works in detail, have a look at the `MergeFrom` class.
 
 ```java
-    @Given("the following trade:")
-    public void the_folowing_trade(List<Map<String, String>> tradeDetails) throws IOException {
+    @Given("the following data for the pet:")
+public void setDataPet(List<Map<String, String>> petDetails) throws IOException {
 
-        trade = MergeFrom.template("templates/trade.json")
-                         .withDefaultValuesFrom(FieldValues.in("templates/standard-trade.properties"))
-                         .withFieldsFrom(tradeDetails.get(0));
-    }
-```
 
-Once the message to be posted has been prepared, we use another action class (`tradingSystem`) to perform the post:
+    pet = MergeFrom.template("templates/petCreate.json")
+            .withDefaultValuesFrom(FieldValues.in("templates/standard-pet.properties"))
+            .withFieldsFrom(petDetails.get(0));
 
-```java
-    @Steps
-    RecordNewTrade recordNewTrade;
-   
-    @When("I record the trade")
-    public void i_record_the_trade() {
-        recordNewTrade.withDetails(trade);
-    }
-```
-
-The `RecordNewTrade` class is responsible for posting this query to the end point, as shown below:
-
-```java
-public class RecordNewTrade {
-
-    @Step("Record a new trade")
-    public void withDetails(String trade) {
-        SerenityRest.given()
-                .contentType("application/json")
-                .header("Content-Type", "application/json")
-                .body(trade)
-                .when()
-                .post(WebServiceEndPoints.TRADE.getUrl());
-    }
 }
 ```
 
-The last step checks that the total cost has been recorded correctly in the trade. 
-In a real project, this would typically be implemented via another REST call or by a database query, but here 
-we are illustrating how we can get and compare tabular data from JSON responses. 
+Once the message to be posted has been prepared, we use another action class (`petCrudSystem`) to perform the post:
+
+```java
+     @Steps
+    RecordNewPet recordNewPet;
+
+    @When("I record the pet")
+    public void recordPet() {
+       recordNewPet.withDetails(pet);
+    }
+```
+
+The `RecordNewPet` class is responsible for posting this query to the end point, as shown below:
+
+```java
+public class RecordNewPet {
+
+    @Step("Record a new pet")
+    public void withDetails(String pet) {
+        SerenityRest.given()
+                .baseUri(Constants.BASE_URL)
+                .contentType(ContentType.JSON)
+                .body(pet)
+                .when()
+                .post(WebServiceEndPoints.PET.getPath());
+    }
+}
+```
+The last step checks that the response provided gives a valid body, the validation is done with a
+JSON SCHEMA matches class that performs a comparison between the response
+```java
+    @Then("the response message should have a valid body")
+public void validateResponse() {
+    restAssuredThat(response -> response.statusCode(200));
+    SerenityRest.restAssuredThat(response -> response.body(matchesJsonSchemaInClasspath("schemas/pet-schema.json")));
+
+}
+```
+This is the JSON SCHEMA structure for the comparison located in `schemas` folder
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "category": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "name": {
+      "type": "string"
+    },
+    "photoUrls": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "tags": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "name"
+          ]
+        }
+      ]
+    },
+    "status": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "category",
+    "name",
+    "photoUrls",
+    "tags",
+    "status"
+  ]
+}
+```
+
+## Get scenario
+The project comes with two kind of scenarios fo getting the data `/pet/{petId}` which queries with the id url and the other type of scenario 
+is `/pet/findByStatus?status=` which takes query parameters for providing the data 
+
+```Gherkin
+  @ApiTest
+  Scenario: find a pet by id
+  Given the following data for searching the pet:
+    | id |
+    | 10 |
+  Then the response message should have a valid body for the query
+```
+The implementation follows a similar approach for getting the id and when it finds the data the validation is also with a JSON SCHEMA
+
+## PUT scenario
+
+This scenario follows the same Get approach for creating the data, but it validates the response 
+in a different way, the objective is to validate that the changes performed were applied 
+
+```gherkin
+  @ApiTest
+  Scenario: update an existent pet based on form data
+  Given I update the the pet with edition on form data:
+    | id | name   | status    |
+    | 10 | Juanes | available |
+  Then the response should include the following details:
+    | id | name   | status    |
+    | 10 | Juanes | available |
+```
+
+The  step checks that the changes has been implemented correctly in the Pet chosen.
 
 ```java
     @Steps
     TradeResponse theTradeDetails;
-  
-    @Then("the recorded trade should include the following details:")
-    public void the_recorded_trade_should_contain_the_following_details(List<Map<String, String>> tradeDetails) {
-        restAssuredThat(response -> response.statusCode(200));
 
-        Map<String, String> expectedResponse = tradeDetails.get(0);
-        Map<String, String> actualResponse = theTradeDetails.returned();
+@Then("the response should include the following details:")
+public void the_response_should_include_the_following_details(List<Map<String, String>> petDetails) throws IOException{
+    petExpected = MergeFrom.template("templates/petCreate.json")
+            .withDefaultValuesFrom(FieldValues.in("templates/standard-pet.properties"))
+            .withFieldsFrom(petDetails.get(0));
 
-        assertThat(actualResponse).containsAllEntriesOf(expectedResponse);
-    }
+    restAssuredThat(response -> response.statusCode(200));
+
+    Map<String, String> expectedResponse = recordPetResponse.returned();
+    Map<String, String> actualResponse  = recordPetResponse.fromJson(petExpected);
+
+    ResponseValidator.assertResponseContains(actualResponse, expectedResponse);
+
+}
 ```
 
-The `TradeResponse` class is responsible for retrieving the latest REST response and converting it to a map of strings.
+The `RecordPetResponse` class is responsible for retrieving the data response and converting it to a map of strings.
 ```java
-public class TradeResponse {
+public class RecordPetResponse {
+
+    private final ObjectMapper mapper = new ObjectMapper();
+
     public Map<String, String> returned() {
-       return mapOfStringsFrom(SerenityRest.lastResponse().getBody().as(Map.class));
+        return mapOfStringsFrom(SerenityRest.lastResponse().getBody().as(Map.class));
     }
 
-    private Map<String,String> mapOfStringsFrom(Map<String, Object> map) {
+    private Map<String, String> mapOfStringsFrom(Map<String, Object> map) {
         return map.entrySet()
                 .stream()
-                .collect(toMap(Map.Entry::getKey,
-                        entry -> entry.getValue().toString()));
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> String.valueOf(entry.getValue())
+                ));
+    }
+
+    public Map<String, String> fromJson(String json) throws IOException {
+        Map<String, Object> rawMap = mapper.readValue(json, new TypeReference<Map<String, Object>>() {});
+        return mapOfStringsFrom(rawMap);
     }
 }
 ```
 
 ## Living documentation
 
-You can generate full Serenity reports by running `mvn clean verify`. 
+It is possible to generate full Serenity reports by running `mvn clean verify` or `./gradlew clean test`. 
 This includes both the living documentation from the feature files:
 
-![](src/docs/rest-feature.png)
+![](src/docs/pet-feature.png)
 
 And also details of the REST requests and responses that were executed during the test:
 

@@ -155,8 +155,6 @@ public class PetStepDefinitions {
         Map<String, String> actualResponse  = recordPetResponse.fromJson(petExpected);
 
         ResponseValidator.assertResponseContains(actualResponse, expectedResponse);
-//        assertThat(actualResponse).as("Fail validation, the expected Value is diferent from the actual value").containsAllEntriesOf(expectedResponse);
-
     }
     @Given("I update the the pet with edition on form data:")
     public void the_following_data_for_the_pet_edition_on_form_data(List<Map<String, String>> petData) {
