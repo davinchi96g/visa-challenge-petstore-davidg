@@ -52,6 +52,8 @@ Depending on the context, we can adjust the expected response to validate altern
 
 ## ▶️ How to Run the Tests
 
+A brief description of the automation project implementation can be found in the `README.md` file located inside the `visa-challenge-petstore-automation folder`
+
 ### 🧪 Functional Tests
 
 The project can run the automated tests using either **Gradle** or **Maven**
